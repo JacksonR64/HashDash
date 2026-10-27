@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 .DS_Store
 .serena/
+AGENTS.override.md
+CLAUDE.local.md
 .env*
 *.local.json
 data/
