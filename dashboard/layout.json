@@ -1,0 +1,21 @@
+{
+  "initial_view": "everyday",
+  "show_seconds": true,
+  "views": {
+    "everyday": {"title": "Everyday", "style": "around", "quiet_labels": true, "hero": "shift", "columns": [["printers"], ["agenda", "reminders", "mail", "claude"]], "rows": [], "printer_limit": 2, "slots": {"top_left": "reminders", "top_middle": "mail", "top_right": "claude", "printers": "printers", "center": "shift", "bottom_right": "agenda", "footer": "health"}},
+    "fleet": {"title": "Printer fleet", "style": "around", "columns": [["printers"]], "rows": [["shift", "claude"]], "printer_columns": 2, "printer_limit": 6, "slots": {"center": "shift", "bottom_left": "reminders", "bottom_middle": "mail", "bottom_right": "claude", "footer": "health"}},
+    "night": {"title": "Night", "style": "around", "rows": [["alarm"]], "slots": {"center": "alarm"}},
+    "servers": {"title": "Servers", "style": "around", "rows": [["health"]], "slots": {"health": "health"}, "health_labels": {"i7": "i7 / Proxmox", "i5": "i5 / Proxmox", "ha_flat": "HA / Flat", "ha_house": "HA / House", "router": "OpenWrt", "internet": "Internet", "m5": "M5 MacBook", "tailscale": "Tailscale"}},
+    "help": {"title": "Help", "style": "around", "rows": [["printers", "health"]], "slots": {"printers": "printers", "health": "health"}}
+  },
+  "modules": {
+    "shift": {"title": "Work", "file": "shift.json", "max_age_seconds": 900, "max_lines": 3},
+    "printers": {"title": "Printers", "format": "printers", "file": "printers.json", "max_age_seconds": 90, "max_lines": 12},
+    "agenda": {"title": "Today", "file": "agenda.json", "max_age_seconds": 900, "max_lines": 6},
+    "claude": {"title": "Claude Code", "file": "claude.json", "max_age_seconds": 90, "max_lines": 3},
+    "alarm": {"title": "Next alarm / shift", "file": "alarm.json", "max_age_seconds": 900, "max_lines": 2},
+    "reminders": {"title": "To do", "file": "reminders.json", "max_age_seconds": 900, "max_lines": 3},
+    "mail": {"title": "Flagged mail", "file": "mail.json", "max_age_seconds": 900, "max_lines": 1},
+    "health": {"title": "Systems", "file": "health.json", "max_age_seconds": 180, "max_lines": 10}
+  }
+}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh console dashboard status every 30 seconds
+
+[Timer]
+OnBootSec=45
+OnUnitInactiveSec=30
+AccuracySec=1
+Unit=console-dashboard-data.service
+
+[Install]
+WantedBy=timers.target

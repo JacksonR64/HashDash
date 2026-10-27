@@ -1,0 +1,9 @@
+{
+  "i7": {"url": "https://pve-one.example.invalid:8006/api2/json/cluster/resources", "auth": "REPLACE_WITH_PVEAUDITOR_AUTH", "ca": "REPLACE_WITH_YOUR_CA_PEM"},
+  "i5": {"url": "https://pve-two.example.invalid:8006/api2/json/cluster/resources", "auth": "REPLACE_WITH_PVEAUDITOR_AUTH", "ca": "REPLACE_WITH_YOUR_CA_PEM"},
+  "ha_flat": "http://ha-one.example.invalid/manifest.json",
+  "ha_house": "http://ha-two.example.invalid/manifest.json",
+  "router": "http://router.example.invalid/ports.json",
+  "internet": "http://router.example.invalid/wanquality.json",
+  "m5_ip": "100.64.0.2"
+}

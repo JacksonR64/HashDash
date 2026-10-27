@@ -1,0 +1,32 @@
+[Unit]
+Description=Modular text dashboard on the i7 MacBook display
+After=systemd-vconsole-setup.service getty.target
+Conflicts=getty@tty8.service console-clock.service
+
+[Service]
+Type=simple
+Environment=TERM=linux
+Environment=PYTHONDONTWRITEBYTECODE=1
+StandardInput=tty
+StandardOutput=tty
+StandardError=journal
+TTYPath=/dev/tty8
+TTYReset=yes
+TTYVHangup=yes
+ExecStartPre=/usr/bin/setfont -C /dev/tty8 /usr/share/consolefonts/Lat15-Terminus24x12.psf.gz
+ExecStartPre=/usr/bin/chvt 8
+ExecStartPre=-/usr/bin/setterm --blank 0
+ExecStart=/usr/bin/python3 /usr/local/lib/console-clock/dashboard/dashboard.py --config /etc/console-dashboard/layout.json --data-dir /var/lib/console-clock/dashboard
+ExecStopPost=-/usr/bin/setfont -C /dev/tty8 /usr/local/lib/console-clock/previous-console-font.psf
+ExecStopPost=/usr/bin/chvt 1
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=strict
+PrivateTmp=yes
+StateDirectory=console-clock
+ReadWritePaths=/sys/class/backlight/acpi_video0/brightness
+
+[Install]
+WantedBy=multi-user.target

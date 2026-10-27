@@ -1,0 +1,10 @@
+[Unit]
+Description=Read-only infrastructure checks for bedroom dashboard
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 /usr/local/lib/console-clock/dashboard/collect_health.py
+TimeoutStartSec=15
+Nice=10
