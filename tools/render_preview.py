@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render the real dashboard as SVG, with deterministic fictional data only."""
 import argparse
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 import sys
@@ -34,12 +35,13 @@ def main():
     assert len(frame) == 37 and all(len(line) == 120 for line in frame)
     svg = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-label="HashDash: fictional demo data">',
            '<rect width="1440" height="900" fill="#080808"/>',
-           '<g fill="#eeeeee" font-family="monospace" font-size="20" xml:space="preserve">']
+           '<g fill="#eeeeee" font-family="Courier New,monospace" font-size="20" font-weight="400">']
     for row, line in enumerate(frame):
-        svg.append(f'<text x="0" y="{row * 24 + 20}">{escape(line)}</text>')
+        for match in re.finditer(r"\S+", line):
+            svg.append(f'<text x="{match.start() * 12}" y="{row * 24 + 20}" textLength="{len(match[0]) * 12}" lengthAdjust="spacingAndGlyphs">{escape(match[0])}</text>')
     colours = {"ok": "#eeeeee", "warning": "#e9bb6c", "fault": "#ef8585", "unknown": "#888888"}
     for row, col, length, status in clock_style_spans(config, records, args.view, now, 120, 37, app.CLOCK["FONT"]):
-        svg.append(f'<text x="{col * 12}" y="{row * 24 + 20}" fill="{colours[status]}">{escape(frame[row][col:col + length])}</text>')
+        svg.append(f'<text x="{col * 12}" y="{row * 24 + 20}" fill="{colours[status]}" textLength="{length * 12}" lengthAdjust="spacingAndGlyphs">{escape(frame[row][col:col + length])}</text>')
     svg.extend(("</g>", "</svg>"))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text("\n".join(svg) + "\n")

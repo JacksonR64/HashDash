@@ -46,11 +46,11 @@ Tab/arrows cycle views. `+`/`-` adjusts brightness where the Linux backlight int
 | Red | Reported/confirmed fault | Last print reported failed; explicit offline host or stopped Tailscale backend |
 | Dim grey | Unknown or stale | Missing source, old result, earlier-job verdict or unavailable AI coverage |
 
-An AI suspicion is **not** a confirmed failed print. Confidence describes the AI's judgement, not the chance the print will succeed. Missing data never becomes a healthy tick. Press5 for the explanation and current causes; press2/4 for detailed sources.
+An AI suspicion is **not** a confirmed failed print. Confidence describes the AI's judgement, not the chance the print will succeed. Missing data never becomes a healthy tick. Press **5** for the explanation and current causes; press2/4 for detailed sources.
 
 ## How it works
 
-The renderer reads small independent JSON summaries every five seconds. Collectors run separately, write atomically, retain private file permissions and keep the original timestamps on failure. Each module has its own freshness limit. The clock uses local time and continues when a source fails.
+The renderer reads small independent JSON summaries every five seconds. Collectors run separately, write atomically, retain private file permissions and keep the original timestamps on failure. Each module has its own freshness limit. The clock uses Europe/London time, including daylight-saving changes, and continues when a source fails.
 
 `dashboard/layout.json` controls views, module placement, limits and age thresholds. Ordinary modules supply a timestamp and text lines; printers and services can also provide structured items. The dashboard does not control printers or modify source apps.
 
