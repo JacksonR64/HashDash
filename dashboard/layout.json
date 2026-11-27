@@ -16,6 +16,7 @@
     "alarm": {"title": "Next alarm / shift", "file": "alarm.json", "max_age_seconds": 900, "max_lines": 2},
     "reminders": {"title": "To do", "file": "reminders.json", "max_age_seconds": 900, "max_lines": 3},
     "mail": {"title": "Flagged mail", "file": "mail.json", "max_age_seconds": 900, "max_lines": 1},
-    "health": {"title": "Systems", "file": "health.json", "max_age_seconds": 180, "max_lines": 10}
+    "health": {"title": "Systems", "file": "health.json", "max_age_seconds": 180, "max_lines": 10},
+    "lan": {"title": "LAN", "file": "lan.json", "max_age_seconds": 60, "max_lines": 1, "down_after_seconds": 120}
   }
 }

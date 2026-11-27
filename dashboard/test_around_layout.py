@@ -223,6 +223,34 @@ class AroundLayoutTests(unittest.TestCase):
             with patch("collect_health.get_json", return_value=dict(data, **changes)):
                 self.assertEqual(internet_check("unused")[0], expected)
 
+    def test_sustained_lan_loss_turns_whole_clock_red_and_recovery_restores_it(self):
+        from collect_lan import next_record
+        ago = lambda s: (self.now - timedelta(seconds=s)).isoformat()
+        base = {"updated_at": self.now.isoformat(), "lines": [], "reachable": False, "label": "Test host offline"}
+        normal = clock_style_spans(self.config, self.records, "everyday", self.now, 180, 56, d.CLOCK["FONT"])
+        for record in (None, dict(base, down_since=ago(30)), dict(base, reachable=True, down_since=None),
+                       dict(base, down_since=ago(600), updated_at=ago(300))):
+            records = dict(self.records, lan=record)
+            self.assertEqual(clock_style_spans(self.config, records, "everyday", self.now, 180, 56, d.CLOCK["FONT"]), normal)
+            self.assertNotIn("Test host offline", "\n".join(d.render(self.config, records, "everyday", self.now, 180, 56)))
+        records = dict(self.records, lan=dict(base, down_since=ago(180)))
+        for view in ("everyday", "fleet", "servers", "help"):
+            frame = d.render(self.config, records, view, self.now, 180, 56)
+            spans = clock_style_spans(self.config, records, view, self.now, 180, 56, d.CLOCK["FONT"])
+            self.assertTrue(spans and all(level == "fault" for *_, level in spans))
+            *digits, (label_y, x, length, _) = spans
+            self.assertEqual(frame[label_y][x:x + length], "Test host offline")
+            for y, x, length, _ in digits:
+                self.assertEqual(frame[y][x:x + length], "#" * length)
+            self.assertEqual(sum(length for _, _, length, _ in digits), sum(line.count("#") for line in frame[spans[0][0]:label_y]))
+        self.assertEqual(clock_style_spans(self.config, records, "night", self.now, 180, 56, d.CLOCK["FONT"]), [])
+        first = next_record({}, False, self.now, "x")
+        later = next_record(first, False, self.now + timedelta(seconds=15), "x")
+        self.assertEqual(later["down_since"], first["down_since"])
+        self.assertIsNone(next_record(later, True, self.now + timedelta(seconds=30), "x")["down_since"])
+        old = next_record(dict(first, updated_at=ago(600)), False, self.now, "x")
+        self.assertEqual(old["down_since"], self.now.isoformat())
+
 
 if __name__ == "__main__":
     unittest.main()

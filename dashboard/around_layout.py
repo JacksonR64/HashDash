@@ -101,11 +101,37 @@ def service_status(record, now, max_age):
                  else "ok" if item["status"] == "offline" else item["status"] for item in items)
 
 
+def lan_offline(config, records, now):
+    """Clock label when this host's own gateway has been unreachable for a sustained time, else None."""
+    spec = config["modules"].get("lan")
+    record = records.get("lan")
+    if not spec or not isinstance(record, dict) or not fresh(record, now, spec["max_age_seconds"]):
+        return None  # missing or stale feed is unknown, never an outage
+    if record.get("reachable") is not False:
+        return None
+    try:
+        since = datetime.fromisoformat(record["down_since"].replace("Z", "+00:00"))
+        if (now - since).total_seconds() < spec.get("down_after_seconds", 120):
+            return None
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return None
+    return text(record.get("label") or "Network offline")[:40]
+
+
 def clock_style_spans(config, records, view_name, now, columns, rows, font):
     view = config["views"][view_name]
     if view.get("style") != "around" or columns < 90 or rows < 35 or view_name == "night":
         return []
-    _, x, y = clock_geometry(now, font, columns, rows, config.get("show_seconds", True))
+    art, x, y = clock_geometry(now, font, columns, rows, config.get("show_seconds", True))
+    label = lan_offline(config, records, now)
+    if label:
+        # Sustained LAN loss: every clock digit, the seconds and the label turn red.
+        spans = [(y + row, x + m.start(), len(m[0]), "fault") for row, line in enumerate(art) for m in re.finditer("#+", line)]
+        if config.get("show_seconds", True):
+            spans += [(y + len(art) - 5 + row, x + len(art[0]) + 2 + m.start(), len(m[0]), "fault")
+                      for row, line in enumerate(seconds_art(now)) for m in re.finditer("#+", line)]
+        label = fit(label, columns - 4)
+        return spans + [(y + len(art), max(2, (columns - len(label)) // 2), len(label), "fault")]
     value = now.strftime("%H:%M")
     base = sum(len(font[c][0]) for c in value) + len(value) - 1
     stretch = max(1, min(4, (columns - 14) // base))
@@ -183,6 +209,8 @@ def compose(config, records, view_name, now, columns, rows, module_lines, font, 
     if config.get("show_seconds", True):
         for offset, line in enumerate(seconds_art(now)):
             put(clock_y + len(art) - 5 + offset, clock_x + len(art[0]) + 2, line)
+    if view_name != "night" and lan_offline(config, records, now):
+        centered(clock_y + len(art), lan_offline(config, records, now))
     navigation = "  ".join(f"[{i + 1} {name.title()}]" if name == view_name else f"{i + 1} {name.title()}" for i, name in enumerate(config["views"]))
     if view_name == "help":
         printer_name = slots.get("printers", "printers")
