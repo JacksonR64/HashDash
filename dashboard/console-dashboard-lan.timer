@@ -1,0 +1,10 @@
+[Unit]
+Description=Check the LAN gateway for the console dashboard every 15 seconds
+
+[Timer]
+OnBootSec=30
+OnUnitInactiveSec=15
+AccuracySec=1
+
+[Install]
+WantedBy=timers.target

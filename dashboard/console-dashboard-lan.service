@@ -1,0 +1,11 @@
+[Unit]
+Description=Read-only LAN gateway check for console dashboard
+ConditionPathExists=/etc/console-dashboard/lan.env
+
+[Service]
+Type=oneshot
+Environment=PYTHONDONTWRITEBYTECODE=1
+EnvironmentFile=/etc/console-dashboard/lan.env
+ExecStart=/usr/bin/python3 /usr/local/lib/console-clock/dashboard/collect_lan.py
+TimeoutStartSec=15
+Nice=10
